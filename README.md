@@ -38,9 +38,7 @@ bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_vali
 
 ### PWR Chain
 - **Website**: [pwrchain.org](https://pwrchain.org)
-- **GitHub**: [pwrlabs/PWR-Validator](https://github.com/pwrlabs/PWR-Validator)
 - **Discord**: [PWR Chain Official Server](https://discord.gg/pwrchain)
-- **Documentation**: [docs.pwrchain.org](https://docs.pwrchain.org)
 
 ---
 
@@ -53,50 +51,32 @@ bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_vali
 4. **❌ Выход / Exit** - Завершение работы
 
 ### Меню управления / Management Menu
-1. **📋 Логи / Logs** - Просмотр логов ноды
+1. **📋 Логи / Logs** - Просмотр логов ноды (официальный метод)
 2. **🔄 Обновление / Update** - Обновление валидатора
 3. **🔄 Перезапуск / Restart** - Перезапуск ноды
-4. **⬅️ Назад / Back** - Возврат в главное меню
+4. **📍 Показать адрес ноды / Show Node Address** - Получение адреса валидатора
+5. **⬅️ Назад / Back** - Возврат в главное меню
 
 ---
 
-## 🚀 Быстрый старт / Quick Start
-
-### 1. Прямой запуск / Direct Run
-```bash
-bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_validator.sh)
-```
-
-### 2. Альтернативный способ / Alternative Method
-```bash
-# Скачивание / Download
-wget https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_validator.sh
-
-# Запуск / Run
-chmod +x pwr_validator.sh
-./pwr_validator.sh
-```
-
-### 3. Использование / Usage
-1. Выберите язык (Русский/English)
-2. Выберите нужную опцию из меню
-3. Следуйте инструкциям на экране
-
 ---
 
-## 📱 Командная строка / Command Line
+## 💾 Важные файлы / Important Files
+
+### Бэкап критически важных файлов / Backup Critical Files
+
+**⚠️ ВАЖНО / IMPORTANT**: После установки обязательно сохраните следующие файлы в безопасном месте:
+
+**Important files to backup after installation:**
 
 ```bash
-# Прямой запуск через curl (рекомендуется)
-bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_validator.sh)
+# Файлы находятся в / Files located in:
+~/pwr-validator/
 
-# Запуск интерактивного меню (если скачан локально)
-./pwr_validator.sh
-
-# Прямой запуск установки (если скачан локально)
-./pwr_validator.sh install
+# Критически важные файлы / Critical files:
+~/pwr-validator/wallet    # Кошелек валидатора / Validator wallet
+~/pwr-validator/password  # Пароль валидатора / Validator password
 ```
-
 ---
 
 ## 🔧 Устранение неполадок / Troubleshooting
@@ -105,7 +85,12 @@ bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_vali
 
 #### Java не установлена / Java not installed
 ```bash
-sudo apt install openjdk-24-jre-headless -y
+# Установка Java 21 (требуется для PWR Validator)
+sudo apt install openjdk-21-jre-headless -y
+
+# Альтернативные версии Java
+sudo apt install openjdk-17-jre-headless -y
+sudo apt install openjdk-11-jre-headless -y
 ```
 
 #### Проблемы с портами / Port Issues
@@ -129,7 +114,10 @@ sudo netfilter-persistent save
 
 #### Нода не запускается / Node won't start
 ```bash
-# Проверьте логи
+# Проверьте логи (официальный метод PWR Chain)
+tail -n 1000 ~/pwr-validator/nohup.out -f
+
+# Альтернативный способ просмотра логов
 tail -f ~/pwr-validator/validator.log
 
 # Проверьте Java
@@ -161,14 +149,17 @@ curl ifconfig.me
 ### Логи и диагностика / Logs and Diagnostics
 
 ```bash
-# Основные логи
-tail -f ~/pwr-validator/validator.log
+# Основные логи (официальный метод PWR Chain)
+tail -n 1000 ~/pwr-validator/nohup.out -f
 
-# Системные логи
-journalctl -u pwr-validator -f
+# Альтернативный способ просмотра логов
+tail -f ~/pwr-validator/validator.log
 
 # Проверка процессов
 ps aux | grep validator
+
+# Получение адреса валидатора
+cd ~/pwr-validator && java -jar validator.jar get-address password
 ```
 
 ---
