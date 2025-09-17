@@ -168,7 +168,6 @@ cd ~/pwr-validator && java -jar validator.jar get-address password
 **Создано командой CryptoCompass / Created by CryptoCompass Team**
 
 *Версия / Version: 1.0.0*
-*Последнее обновление / Last updated: $(date +%Y-%m-%d)*
 
 ---
 
