@@ -358,8 +358,7 @@ start_node() {
     pkill -f "validator.jar" 2>/dev/null || true
 
     # Use nohup.out as per official documentation
-    # nohup java --enable-native-access=ALL-UNNAMED -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
-    nohup sudo java --enable-native-access=ALL-UNNAMED -Xms1g -Xmx6g -jar validator.jar --ip "$server_ip" --password password &
+    nohup java --enable-native-access=ALL-UNNAMED -Xms1g -Xmx6g -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
     sleep 3
 
     if pgrep -f "validator.jar" > /dev/null; then
@@ -461,9 +460,7 @@ restart_node() {
             fi
         fi
 
-        # nohup java --enable-native-access=ALL-UNNAMED -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
-        # sleep 3
-        nohup sudo java --enable-native-access=ALL-UNNAMED -Xms1g -Xmx6g -jar validator.jar --ip "$server_ip" --password password &
+        nohup java --enable-native-access=ALL-UNNAMED -Xms1g -Xmx6g -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
         sleep 3
 
         if pgrep -f "validator.jar" > /dev/null; then
@@ -480,46 +477,48 @@ restart_node() {
 update_validator() {
     show_info "🔄 $(get_text "update")..."
 
+    # Check if validator is installed first
+    if ! is_validator_installed; then
+        show_error "Валидатор не установлен / Validator not installed"
+        return 1
+    fi
+
     cd ~/pwr-validator
     sudo pkill java
     sleep 5
     sudo pkill -9 java
     sudo rm -rf validator.jar config.json nohup.out
 
-    if [[ -f validator.jar ]]; then
-        show_info "Получение последней версии / Getting latest version..."
+    show_info "Получение последней версии / Getting latest version..."
 
-        # Get latest release version from GitHub API
-        latest_version=$(curl -s https://api.github.com/repos/pwrlabs/PWR-Validator/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    # Get latest release version from GitHub API
+    latest_version=$(curl -s https://api.github.com/repos/pwrlabs/PWR-Validator/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-        if [[ -z "$latest_version" ]]; then
-            show_error "Не удалось получить версию / Could not get version"
-            show_warning "Используется версия по умолчанию / Using default version"
-            latest_version="15.63.38"
-        fi
-
-        show_info "Скачивание версии $latest_version / Downloading version $latest_version"
-
-        # Download latest validator.jar
-        if wget -O validator.jar "https://github.com/pwrlabs/PWR-Validator/releases/download/$latest_version/validator.jar" 2>/dev/null; then
-            show_success "validator.jar обновлен до версии $latest_version / validator.jar updated to version $latest_version"
-        else
-            show_error "Ошибка скачивания validator.jar / Error downloading validator.jar"
-            return 1
-        fi
-
-        # Download latest config.json
-        if wget -O config.json "https://github.com/pwrlabs/PWR-Validator/raw/refs/heads/main/config.json" 2>/dev/null; then
-            show_success "config.json обновлен / config.json updated"
-        else
-            show_warning "Ошибка скачивания config.json / Error downloading config.json"
-        fi
-
-        show_success "Валидатор обновлен до версии $latest_version! / Validator updated to version $latest_version!"
-        show_warning "Перезапустите ноду для применения обновлений / Restart node to apply updates"
-    else
-        show_error "Валидатор не установлен / Validator not installed"
+    if [[ -z "$latest_version" ]]; then
+        show_error "Не удалось получить версию / Could not get version"
+        show_warning "Используется версия по умолчанию / Using default version"
+        latest_version="15.63.38"
     fi
+
+    show_info "Скачивание версии $latest_version / Downloading version $latest_version"
+
+    # Download latest validator.jar
+    if wget -O validator.jar "https://github.com/pwrlabs/PWR-Validator/releases/download/$latest_version/validator.jar" 2>/dev/null; then
+        show_success "validator.jar обновлен до версии $latest_version / validator.jar updated to version $latest_version"
+    else
+        show_error "Ошибка скачивания validator.jar / Error downloading validator.jar"
+        return 1
+    fi
+
+    # Download latest config.json
+    if wget -O config.json "https://github.com/pwrlabs/PWR-Validator/raw/refs/heads/main/config.json" 2>/dev/null; then
+        show_success "config.json обновлен / config.json updated"
+    else
+        show_warning "Ошибка скачивания config.json / Error downloading config.json"
+    fi
+
+    show_success "Валидатор обновлен до версии $latest_version! / Validator updated to version $latest_version!"
+    show_warning "Перезапустите ноду для применения обновлений / Restart node to apply updates"
 }
 
 # Remove validator
