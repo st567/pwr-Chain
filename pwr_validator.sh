@@ -114,6 +114,11 @@ get_text() {
                 "address") echo "Адрес валидатора: " ;;
                 "show_address") echo "Показать адрес ноды" ;;
                 "show_seed") echo "Показать сид-фразу" ;;
+                "import_wallet") echo "Импорт кошелька" ;;
+                "enter_seed_phrase") echo "Введите сид-фразу для импорта: " ;;
+                "importing_wallet") echo "Импорт кошелька..." ;;
+                "wallet_imported") echo "Кошелек успешно импортирован!" ;;
+                "import_failed") echo "Ошибка импорта кошелька" ;;
                 "seed_phrase") echo "Сид-фраза валидатора" ;;
                 "node_address") echo "Адрес ноды" ;;
                 "remove_confirm") echo "Вы уверены, что хотите удалить PWR Validator?" ;;
@@ -164,6 +169,11 @@ get_text() {
                 "address") echo "Validator address: " ;;
                 "show_address") echo "Show Node Address" ;;
                 "show_seed") echo "Show Seed Phrase" ;;
+                "import_wallet") echo "Import Wallet" ;;
+                "enter_seed_phrase") echo "Enter seed phrase for import: " ;;
+                "importing_wallet") echo "Importing wallet..." ;;
+                "wallet_imported") echo "Wallet successfully imported!" ;;
+                "import_failed") echo "Wallet import failed" ;;
                 "seed_phrase") echo "Validator Seed Phrase" ;;
                 "node_address") echo "Node Address" ;;
                 "remove_confirm") echo "Are you sure you want to remove PWR Validator?" ;;
@@ -441,6 +451,60 @@ show_seed_phrase() {
     fi
 }
 
+# Import wallet from seed phrase
+import_wallet() {
+    show_info "$(get_text "import_wallet")"
+    cd ~/pwr-validator
+
+    if [[ -f validator.jar ]] && [[ -f password ]]; then
+        echo ""
+        show_warning "⚠️ ВАЖНО / IMPORTANT:"
+        show_white "• Убедитесь, что нода остановлена / Make sure the node is stopped"
+        show_white "• Импорт заменит текущий кошелек / Import will replace current wallet"
+        show_white "• Сохраните текущую сид-фразу перед импортом / Save current seed phrase before import"
+        echo ""
+
+        read -p "$(show_cyan "Продолжить импорт? Continue import? [y/n]: ")" confirm_import
+
+        if [[ $confirm_import =~ ^[Yy]$ ]]; then
+            echo ""
+            show_info "$(get_text "enter_seed_phrase")"
+            read -p "$(show_cyan "Seed phrase: ")" seed_phrase
+
+            if [[ -n "$seed_phrase" ]]; then
+                show_info "$(get_text "importing_wallet")"
+
+                # Import wallet using seed phrase
+                if java -jar validator.jar import-seed-phrase password "$seed_phrase" 2>/dev/null; then
+                    echo ""
+                    show_success "$(get_text "wallet_imported")"
+                    show_info "Новый адрес валидатора / New validator address:"
+
+                    # Get new address after import
+                    new_address=$(java -jar validator.jar get-address password 2>/dev/null)
+                    if [[ -n "$new_address" ]]; then
+                        show_cyan "$new_address"
+                    fi
+
+                    echo ""
+                    show_warning "Перезапустите ноду для применения изменений / Restart node to apply changes"
+                else
+                    echo ""
+                    show_error "$(get_text "import_failed")"
+                    show_warning "Проверьте правильность сид-фразы / Check seed phrase correctness"
+                fi
+            else
+                show_error "Сид-фраза не может быть пустой / Seed phrase cannot be empty"
+            fi
+        else
+            show_warning "Импорт отменен / Import cancelled"
+        fi
+    else
+        show_error "Файлы валидатора не найдены / Validator files not found"
+        show_warning "Сначала установите PWR Validator / Install PWR Validator first"
+    fi
+}
+
 # View logs
 view_logs() {
     cd ~/pwr-validator
@@ -621,10 +685,11 @@ show_management_menu() {
         show_white "3) $(get_text "restart")"
         show_white "4) $(get_text "show_address")"
         show_white "5) $(get_text "show_seed")"
+        show_white "6) $(get_text "import_wallet")"
         show_white "0) $(get_text "back")"
         echo ""
 
-        read -p "$(show_cyan "Выбор / Choice [0-5]: ")" choice
+        read -p "$(show_cyan "Выбор / Choice [0-6]: ")" choice
 
         case $choice in
             1)
@@ -649,6 +714,11 @@ show_management_menu() {
                 ;;
             5)
                 show_seed_phrase
+                echo ""
+                read -p "$(show_yellow "$(get_text "press_enter")")"
+                ;;
+            6)
+                import_wallet
                 echo ""
                 read -p "$(show_yellow "$(get_text "press_enter")")"
                 ;;
