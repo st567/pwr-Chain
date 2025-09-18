@@ -55,7 +55,8 @@ bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_vali
 2. **🔄 Обновление / Update** - Обновление валидатора
 3. **🔄 Перезапуск / Restart** - Перезапуск ноды
 4. **📍 Показать адрес ноды / Show Node Address** - Получение адреса валидатора
-5. **⬅️ Назад / Back** - Возврат в главное меню
+5. **🔑 Показать сид-фразу / Show Seed Phrase** - Получение сид-фразы валидатора
+6. **⬅️ Назад / Back** - Возврат в главное меню
 
 ---
 
@@ -76,6 +77,9 @@ bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_vali
 # Критически важные файлы / Critical files:
 ~/pwr-validator/wallet    # Кошелек валидатора / Validator wallet
 ~/pwr-validator/password  # Пароль валидатора / Validator password
+
+# Получение сид-фразы / Getting seed phrase:
+cd ~/pwr-validator && java -jar validator.jar get-seed-phrase password
 ```
 ---
 

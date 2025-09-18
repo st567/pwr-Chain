@@ -113,6 +113,8 @@ get_text() {
                 "node_stopped_msg") echo "Нода остановлена!" ;;
                 "address") echo "Адрес валидатора: " ;;
                 "show_address") echo "Показать адрес ноды" ;;
+                "show_seed") echo "Показать сид-фразу" ;;
+                "seed_phrase") echo "Сид-фраза валидатора" ;;
                 "node_address") echo "Адрес ноды" ;;
                 "remove_confirm") echo "Вы уверены, что хотите удалить PWR Validator?" ;;
                 "removing") echo "Удаление PWR Validator..." ;;
@@ -161,6 +163,8 @@ get_text() {
                 "node_stopped_msg") echo "Node stopped!" ;;
                 "address") echo "Validator address: " ;;
                 "show_address") echo "Show Node Address" ;;
+                "show_seed") echo "Show Seed Phrase" ;;
+                "seed_phrase") echo "Validator Seed Phrase" ;;
                 "node_address") echo "Node Address" ;;
                 "remove_confirm") echo "Are you sure you want to remove PWR Validator?" ;;
                 "removing") echo "Removing PWR Validator..." ;;
@@ -411,6 +415,32 @@ show_node_address() {
     fi
 }
 
+# Show seed phrase
+show_seed_phrase() {
+    show_info "$(get_text "seed_phrase")"
+    cd ~/pwr-validator
+
+    if [[ -f validator.jar ]] && [[ -f password ]]; then
+        seed_phrase=$(java -jar validator.jar get-seed-phrase password 2>/dev/null)
+        if [[ -n "$seed_phrase" ]]; then
+            echo ""
+            show_success "$(get_text "seed_phrase"):"
+            show_cyan "$seed_phrase"
+            echo ""
+            show_warning "⚠️ ВАЖНО / IMPORTANT:"
+            show_white "• Сохраните эту сид-фразу в безопасном месте / Save this seed phrase in a safe place"
+            show_white "• Никому не сообщайте эту информацию / Do not share this information with anyone"
+            show_white "• Используйте для восстановления кошелька / Use to restore wallet"
+        else
+            show_error "Не удалось получить сид-фразу / Could not get seed phrase"
+            show_warning "Убедитесь, что нода запущена / Make sure the node is running"
+        fi
+    else
+        show_error "Файлы валидатора не найдены / Validator files not found"
+        show_warning "Сначала установите PWR Validator / Install PWR Validator first"
+    fi
+}
+
 # View logs
 view_logs() {
     cd ~/pwr-validator
@@ -590,10 +620,11 @@ show_management_menu() {
         show_white "2) $(get_text "update")"
         show_white "3) $(get_text "restart")"
         show_white "4) $(get_text "show_address")"
+        show_white "5) $(get_text "show_seed")"
         show_white "0) $(get_text "back")"
         echo ""
 
-        read -p "$(show_cyan "Выбор / Choice [0-4]: ")" choice
+        read -p "$(show_cyan "Выбор / Choice [0-5]: ")" choice
 
         case $choice in
             1)
@@ -613,6 +644,11 @@ show_management_menu() {
                 ;;
             4)
                 show_node_address
+                echo ""
+                read -p "$(show_yellow "$(get_text "press_enter")")"
+                ;;
+            5)
+                show_seed_phrase
                 echo ""
                 read -p "$(show_yellow "$(get_text "press_enter")")"
                 ;;
