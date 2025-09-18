@@ -37,8 +37,8 @@ bash <(curl -s https://raw.githubusercontent.com/st567/pwr-Chain/master/pwr_vali
 ## 🌐 Социальные сети проекта / Project Social Media
 
 ### PWR Chain
-- **Website**: [pwrchain.org](https://pwrchain.org)
-- **Discord**: [PWR Chain Official Server](https://discord.gg/pwrchain)
+- **Website**: [pwrchain.org](https://www.pwrlabs.io/)
+- **Discord**: [PWR Chain Official Server](https://discord.com/invite/YASmBk9EME)
 
 ---
 

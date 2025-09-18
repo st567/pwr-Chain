@@ -358,8 +358,8 @@ start_node() {
     pkill -f "validator.jar" 2>/dev/null || true
 
     # Use nohup.out as per official documentation
-    nohup java --enable-native-access=ALL-UNNAMED -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
-
+    # nohup java --enable-native-access=ALL-UNNAMED -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
+    nohup sudo java --enable-native-access=ALL-UNNAMED -Xms1g -Xmx6g -jar validator.jar --ip "$server_ip" --password password &
     sleep 3
 
     if pgrep -f "validator.jar" > /dev/null; then
@@ -461,7 +461,9 @@ restart_node() {
             fi
         fi
 
-        nohup java --enable-native-access=ALL-UNNAMED -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
+        # nohup java --enable-native-access=ALL-UNNAMED -jar validator.jar --ip "$server_ip" --password password > nohup.out 2>&1 &
+        # sleep 3
+        nohup sudo java --enable-native-access=ALL-UNNAMED -Xms1g -Xmx6g -jar validator.jar --ip "$server_ip" --password password &
         sleep 3
 
         if pgrep -f "validator.jar" > /dev/null; then
@@ -479,6 +481,10 @@ update_validator() {
     show_info "🔄 $(get_text "update")..."
 
     cd ~/pwr-validator
+    sudo pkill java
+    sleep 5
+    sudo pkill -9 java
+    sudo rm -rf validator.jar config.json nohup.out
 
     if [[ -f validator.jar ]]; then
         show_info "Получение последней версии / Getting latest version..."
